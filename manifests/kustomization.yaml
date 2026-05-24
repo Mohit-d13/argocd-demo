@@ -3,10 +3,10 @@ kind: Kustomization
 
 resources:
 - cm.postgresql.yaml
+- cm.shortener.yaml
 - secret.postgresql.yaml
 - svc.postgresql-headless.yaml
 - sts.postgresql.yaml
 - svc.postgresql.yaml
-- cm.shortener.yaml
 - deploy.shortener.yaml
 - svc.shortener.yaml
