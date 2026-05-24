@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql
+  labels:
+    app: shortener
+    ver: "1.0"
+    rel: canary
+    tier: database
+  annotations:
+    argo.argoproj.io/sync-wave: "3"
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shortener
+      tier: database
+  serviceName: postgresql-headless
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  template:
+    metadata:
+      labels:
+        app: shortener
+        ver: "1.0"
+        rel: canary
+        tier: database
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:18
+        envFrom:
+        - configMapRef:
+            name: postgres-config
+        - secretRef:
+            name: postgres-secret
+        startupProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U postgres
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U postgres
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U postgres
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        ports:
+        - name: postgresdb 
+          containerPort: 5432
+        volumeMounts:
+        - name: pgdata
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: pgdata
+        persistentVolumeClaim:
+          claimName: pgdata
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+      labels:
+        app: shortener
+        tier: database
+    spec:
+      resources:
+        requests:
+          storage: 1Gi
+      accessModes:
+      - ReadWriteOnce

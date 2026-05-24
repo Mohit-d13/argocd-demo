@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: linkset
+  POSTGRES_USER: mohitd13
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: shortener
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"

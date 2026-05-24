@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shortener
+  labels:
+    app: shortener
+    ver: "1.0"
+    rel: canary
+    tier: backend
+  annotations:
+    argo.argoproj.io/sync-wave: "4"
+spec:
+  selector:
+    matchLabels:
+      app: shortener
+      tier: backend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: "25%"
+  template:
+    metadata:
+      labels:
+        app: shortener
+        ver: "1.0"
+        rel: canary
+        tier: backend
+    spec:
+      containers:
+      - name: shortener
+        image: mohitd13/shortener-dev:1.1
+        envFrom:
+        - configMapRef:
+            name: shortener-config
+        - configMapRef:
+            name: postgres-config
+        - secretRef:
+            name: postgres-secret
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 2
+          failureThreshold: 3
+        ports:
+        - name: http
+          containerPort: 8000
+          
