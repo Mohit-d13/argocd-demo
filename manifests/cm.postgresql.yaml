@@ -5,6 +5,7 @@ data:
 kind: ConfigMap
 metadata:
   name: postgres-config
+  namespace: shortener
   labels:
     app: shortener
   annotations:

@@ -8,6 +8,7 @@ data:
 kind: ConfigMap
 metadata:
   name: shortener-config
+  namespace: shortener
   labels:
     app: shortener
   annotations:
