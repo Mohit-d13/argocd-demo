@@ -8,7 +8,7 @@ metadata:
     rel: canary
     tier: database
   annotations:
-    argo.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   selector:
     app: shortener
