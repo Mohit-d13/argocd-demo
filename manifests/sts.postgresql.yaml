@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: postgresql
-        image: postgres:18
+        image: postgres:17
         envFrom:
         - configMapRef:
             name: postgres-config
